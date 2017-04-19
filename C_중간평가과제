@@ -1,0 +1,181 @@
+
+조건
+
+1. 프로그램은 정상적으로 잘 동작하여야 한다.
+2. 사용자의 초기 금액은 1000원으로 설정하며, 게임 판당 10원씩 감소되도록 구현한다.
+3. 사용자 금액이 10원 미만일 경우와 메뉴 3번 입력시 프로그램 종료 된다.
+4. 프로그램의 입/출력되는 기능을 유사하게 구성하라.
+5. "배팅하시겠습니까?(Y/N)" 서택 시 Y 또는 N 이외의 값은 전부 N으로 처리하며, 배팅금액 입력시 '1 ~ 사용자 금액' 범위가 아닐 시 "잘못 입력"이라는 예외 처리를 함.
+6.메뉴 2번 승률 누적 기능을 구현하라.
+7. 사용자가 승리 시 배팅금액만큼 사용자 금액이 증가되며, 무승부 경우는 사용자 금액은 배팅 전 사용자 금액, 사용자 패배 시 배팅 및 판돈(10원)을 제외한 금액이다.
+8. 사용자와 컴퓨터의 Random값 생성시 1~6 범위로 3번 생성한 랜덤 값을 합산하여 구하라.
+9. 화면의 출력이 누적되지 않도록 판당 화면을 정리하시오.
+10. 각 주요 기능에 주석을 사용하여 코드의 부연설명을 작성하시오.
+
+
+-----------------------------------------------------------------------
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <time.h>
+#include <conio.h>
+ 
+void main()
+{
+
+    srand( time(NULL) );
+    int flag,money = 1000,bet; // money 는 초기 판돈이며, 초기값 1000으로 설정함.
+    char answer; // y/n을 받기위한 값
+    int p_num1,p_num2,p_num3,p_sum; //player의 랜덤값 3개와 합계를 위한 변수.
+    int c_num1,c_num2,c_num3,c_sum; //computer의 랜덤값 3개와 합계를 위한 변수.
+    int w_game=0,d_game=0,l_game=0; //누적 승률의 횟수 측정을 위한 변수
+
+
+ 
+ 
+ 
+ 
+ 
+while(1){
+system("cls"); //화면 출력이 누적되지 않도록 판당 화면을 정리.
+ 
+if(money < 10) // 10원 미만일 경우 프로그램 종료를 위한 if문
+{
+    system("cls");
+    printf("======================\n");
+    printf("돈 갖고 오세요^^!!\n");
+    printf("======================\n");
+    printf("계속하려면 아무 키나 누르십시오 . . .");
+    getch();
+    exit(1);
+}
+ 
+      printf("======================\n"); //유사한 프로그램 입출력
+      printf("= = = DICE GAME = = =\n\n"); //유사한 프로그램 입출력
+      printf(" Money = %d \n\n",money); //유사한 프로그램 입출력
+      printf(" 1.Game Start \n"); //유사한 프로그램 입출력
+      printf(" 2.Game Score \n"); //유사한 프로그램 입출력
+      printf(" 3.End Game \n"); //유사한 프로그램 입출력
+      printf("======================\n"); //유사한 프로그램 입출력
+      printf(">");
+      scanf("%d",&flag);
+
+if(flag == 1)
+{
+        p_num1 = rand()%6+1; //사용자 주사위 값 랜덤 생성을 위한 랜덤함수
+        p_num2 = rand()%6+1; //0~5의 값을 리턴하기 때문에 +1을 해준다.
+        p_num3 = rand()%6+1;
+        c_num1 = rand()%6+1;
+        c_num2 = rand()%6+1;
+        c_num3 = rand()%6+1;
+        p_sum = p_num1 + p_num2 + p_num3; // 3번 생성한 랜덤 값의 합산을 구한다.
+        c_sum = c_num1 + c_num2 + c_num3;
+
+
+        money = money - 10; // 게임 시작시 10원 차감
+        printf("== DICE GAME START! ==\n");
+        printf(" 나의 주사위의 합 : %d\n",p_sum);
+        printf("배팅 하시겠습니까 (y/n)? :");
+        fflush(stdin);
+        scanf("%c",&answer);
+ 
+ 
+ 
+if(answer=='y' || answer == 'Y')
+{
+      while(1){ //예외 처리를 위한 while문
+      printf("배팅 금액을 입력해 주세요(1~%d): ",money);
+      scanf("%d",&bet);
+      if(bet>money || bet<1) //금액이 1~사용자금액 사이를 맞추기 위한 조건
+      printf("잘못입력하셨습니다.\n");
+      else //금액이 범위 안 일경우 break
+      break;
+}
+ 
+ 
+printf("============================\n");
+printf("Player : %d\n",p_sum);
+printf("Computer : %d\n",c_sum);
+printf("============================\n");
+ 
+if(p_sum > c_sum)
+{
+        w_game++; //누적 승률 계산을 위한 변수++
+        money = money + bet; //사용자 승리시 배팅 금액 만큼 사용자 금액 증가.
+        printf("당신이 이겼습니다.\n");
+        printf("계속하려면 아무 키나 누르십시오 . . .");
+        getch();
+ 
+}
+else if(p_sum < c_sum)
+{
+        money = money - bet; //판돈은 위에서 제외했고 배팅만큼 사용자 금액 감소.
+        l_game++; //누적 승률 계산을 위한 변수++
+        printf("당신이 졌습니다. ^^\n");
+        printf("계속하려면 아무 키나 누르십시오 . . .");
+        getch();
+}
+else
+{
+      d_game++; //누적 승률 계산을 위한 변수++
+      money = money + 10; //배팅 전 사용 금액을 위해 판돈을 돌려줘야 하기 때문에 +10
+      printf("우린 비겼습니다.\n");
+      printf("계속하려면 아무 키나 누르십시오 . . .");
+      getch();
+}
+ 
+}
+else //n을 포함한 모든 나머지 경우에는 배팅이 되지 않기때문에
+{ //else문을 사용하여 나머지 모든경우를 배팅 no로 만든다.
+      printf("배팅 NO !\n");
+      printf("============================\n");
+      printf("Player : %d\n",p_sum);
+      printf("Computer : %d\n",c_sum);
+      printf("============================\n");
+      if(p_sum > c_sum)
+{
+      printf("당신이 이겼습니다.\n");
+      printf("계속하려면 아무 키나 누르십시오 . . .");
+      getch();
+}
+else if(p_sum < c_sum)
+{
+      printf("당신이 졌습니다. ^^\n");
+      printf("계속하려면 아무 키나 누르십시오 . . .");
+      getch();
+}
+else
+{
+      printf("우린 비겼습니다.\n");
+      printf("계속하려면 아무 키나 누르십시오 . . .");
+      getch();
+}
+ 
+}
+ 
+ 
+ 
+} // flag 1일때 괄호
+ 
+if(flag == 2)
+{
+      printf("============================\n");
+      printf("이긴 경기수 : %d \n",w_game);
+      printf("비긴 경기수 : %d \n",d_game);
+      printf(" 진 경기수 : %d \n",l_game);
+      printf("============================\n");
+      printf("계속하려면 아무 키나 누르십시오 . . .");
+      getch();
+}
+ 
+if(flag == 3)
+{
+      printf("게임이 종료되었습니다.\n");
+      exit(0);
+}
+ 
+}//while괄호
+ 
+}//main 괄호
+
+------------------------------------------------------------------------------
