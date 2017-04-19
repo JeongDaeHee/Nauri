@@ -1,0 +1,234 @@
+서로 다른 자료형의 변수들을
+
+새롭게 변수를 선언하여 연속된 메모리에 할당될 수 있도록 만드는
+
+사용자 정의 변수이다.
+
+선언방법은
+
+struct 변수명
+{
+      포함하고자 하는 변수들;
+};
+
+연관성 있는 변수들끼리 묶어놓는다.
+
+typedef struct 변수명
+{
+      포함하고자 하는 변수들;
+}TEST
+
+라고 선언을 하면 변수를 선언할 때
+
+ TEST t; 
+
+라고 선언할 수 있어 편리성을 높일 수 있다.
+
+또한 구조체의 포인터를 선언할 때에는
+
+PTEST p;
+
+라는 방법으로 손쉽게 선언할 수 있다.\
+
+---------------------------------------------------------
+
+구조체 예제 1
+
+#include <stdio.h>
+#include <string.h>
+
+typedef struct handphone
+{
+ char name[20];
+ int price;
+ char phone_num[14];
+ 
+}HANDPHONE;
+
+void main()
+{
+ HANDPHONE phone = {"INFISCAP",800000,"010-5122-1335"};
+ printf("name : %s\n",phone.name);
+ printf("price : %d\n",phone.price);
+ printf("phone number : %s\n",phone.phone_num);
+}
+
+위의 예제에서는 구조체의 전반적인 문법을 보여준다.
+
+구조체의 객체를 생성한 뒤에는 '객체.멤버'의 형태로
+
+각 변수를 호출 할 수 있다.
+
+함수 값의 입력은 다음과 같이 개별적으로 할 수도 있다.
+
+void main()
+{
+ HANDPHONE phone;
+ strcpy(phone.name,"INFISCAP");
+ phone.price = 800000;
+ strcpy(phone.phone_num,"010-5122-1335");
+
+}
+※문자열을 입력할 때에는 strcpy를 이용하여 해줘야한다.
+
+구조체 변수 또한 변수처럼 대입연산자를 사용할 수 있다.
+
+ HANDPHONE phone,phone2;
+ phone2 = phone;
+ 
+ ----------------------------------------------------------
+ 
+ 구조체 예제 2
+
+#include <stdio.h>
+#include <string.h>
+
+typedef struct test
+{
+ char ch;
+ int num;
+ char str[17];
+ double double_num;
+ 
+}TEST;
+
+void main()
+{
+ TEST s_test;
+ printf("%d\n",sizeof(s_test));
+
+}
+
+위의 예제는 구조체의 총 사이즈가 어떻게 결정되는지에 대해
+
+생각하게 되는 것이다.
+
+구조체의 공간은 단위당  제일 큰 바이트의 기준으로 할당된다.
+
+위에서 단위당 가장 큰 바이트를 가진 것은 double형 즉 8바이트이다.
+
+int와 char가 8바이트 1개에 들어가고 17개의 배열을 커버하기위해
+
+24바이트가 쓰이기 때문에 총 40바이트를 쓰게 된다.
+
+double을 float으로 바꾸게 되면 4바이트가 가장 큰 바이트가 되기 때문에
+
+char에 4바이트 int에 4바이트 char[17]에 20바이트 float에 4바이트
+
+총 32바이트를 할당해 주게 된다.
+
+구조체를 선언할 때 순서또한 영향을 미친다.
+
+예를 들어 char, int, char, int를 선언하게 되면 20바이트를 사용하지만
+
+char, char, int, int로 선언할 경우에는 12바이트밖에 사용하지 않는다.
+
+작은 프로그램을 코딩할 때에는 미미한 정도 이지만, 많은 데이터를
+
+구조체로 사용할 때에는 고려해서 구조체를 선언해야 할 것이다.
+
+---------------------------------------------------------------------
+
+구조체 예제 3
+
+
+#include <stdio.h>
+#include <string.h>
+
+typedef struct member
+{
+ char name[20];
+ char sung[6];
+ int age;
+ char phone_num[14];
+}MEMBER;
+
+void main()
+{
+ char name[20];
+ MEMBER man [5] = {  "이순신","man",37,"010-xxx-yyy",
+      "홍길동","man",16,"-",
+      "유관순","women",15,"010-xxx-yyyy",
+      "정대희","man",27,"010-5122-1335",
+      "신사임당","women",42,"019-xxx-yyyy"};
+ printf("검색할 이름 : ");
+ scanf("%s",name);
+ int i=0;
+
+ while(1)
+ {
+  if( ! strcmp(man[i].name,name) )
+   break;
+  i++;
+ }
+ printf("name : %s\n",man[i].name);
+ printf("sung : %s\n",man[i].sung);
+ printf("age : %d\n",man[i].age);
+ printf("phone : %s\n",man[i].phone_num);
+
+}
+
+구조체를 사용하는 이유는 다음과 같이 하나의 해당되는 사항을 발견했을 때
+
+그 이외의 요소들을 손쉽게 가져올 수 있기 때문이다.
+
+구조체를 쓰지 않았다면 하나하나 strcmp를 통해 해당되는 값을 찾아야 했을 것이다.
+
+--------------------------------------------------------------------------
+
+구조체 예제 4
+
+#include <stdio.h>
+#include <string.h>
+
+typedef struct handphone
+{
+ char name[20];
+ int price;
+ char phone_num[14];
+}HANDPHONE;
+
+void main()
+{
+ HANDPHONE phone;
+ HANDPHONE * ptrPhone;
+ ptrPhone = &phone;
+ ptrPhone->price = 750000;
+
+ printf("%d\n",phone.price);
+
+}
+
+위의 ->연산자는 포인터와 .연산을 합친 형태로
+
+(*ptrPhone).price = 750000;
+
+과 같은 의미가 된다. 매번 괄호와 *를 하기 힘들기 때문에
+
+위와 같이 간단히 ->표시로 대신한다.
+
+위의 연산자는 자주 쓰이니 기억해 두도록 하자.
+
+#include <stdio.h>
+#include <string.h>
+
+typedef struct handphone
+{
+ char name[20];
+ int price;
+ char phone_num[14];
+}HANDPHONE, *PHANDPHONE;
+
+void main()
+{
+ HANDPHONE phone;
+ PHANDPHONE ptrPhone;
+
+포인터는 다음과 같이 구조체에서 미리 정의를 해놓고 쓸 수 있다.
+
+위의 PHANDPHONE로 포인터를 정의 한 뒤에 ptrPhone로 선언을 하면
+
+ptrPhone는 구조체의 포인터 변수로 선언이 된다.
+
+
+ 
