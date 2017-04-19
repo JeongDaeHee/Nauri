@@ -1,0 +1,109 @@
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <time.h>
+#include <conio.h>
+
+int main()
+{
+  int flag;
+  int insert,cnt=0;
+  int best=0;
+  srand( time(NULL) );
+  int answer;
+
+
+ while(1){
+            system("cls");
+
+           printf("%d\n",answer);
+           printf("=== UP % DOWN GAME ===\n");
+           printf("    1.GAME START      \n");
+           printf("    2.GAME SCORE      \n");
+           printf("    3.END GAME        \n");
+           printf("    >");
+           scanf("%d",&flag);
+
+ if(flag==1)
+ {
+            answer = rand()%50+1; // 다시 게임을 할 경우를 대비해 여기서 초기화
+            cnt = 0;   //2번째 게임을 위한 cnt 초기화 위치
+            system("cls");
+            printf(" === START === \n");
+            printf("Input number -->");
+            scanf("%d",&insert);
+
+       while(1)
+               {
+                     if(insert<answer)
+                     {
+                      system("cls");
+                      printf(" === U   P === \n");
+                      printf("Input number -->");
+                      scanf("%d",&insert);
+                      cnt++;
+                      continue;
+                     }
+                     else if(insert>answer)
+                     {
+                      system("cls");
+                      printf(" ===  Down === \n");
+                      printf("Input number -->");
+                      scanf("%d",&insert);
+                      cnt++;
+                      continue;
+                     }
+                     else{
+                      cnt++;//마지막 맞춘 답까지 포함하여 횟수 저장
+                      break;
+                     }
+                 }
+
+  printf("%d만에 맞췄습니다.\n",cnt);
+
+  if(cnt>best)  // 최고기록보다 클 경우 갱신 화면을 출력.
+        {
+        printf("최고 기록을 갱신하였습니다.");
+        best = cnt;
+        }
+
+        printf("계속 하시려면 아무키나 누르세요...");
+        getch(); // 화면 유지를 위한 getch()
+
+        }
+
+ if(flag==2)
+           {
+            printf("최고점수는 %d 입니다.",best);
+            printf("계속 하시려면 아무키나 누르세요...");
+            getch();
+
+           }
+
+ if(flag==3)
+ {
+  printf("게임을 종료합니다.\n");
+  exit(1);
+ }
+
+
+}//제일 큰 while문
+
+
+ return 0;
+}
+
+
+/*
+
+UP&DOWN게임이고 숫자는 50이내의 숫자를 대상으로 
+
+입력 숫자가 답보다 작으면 UP을 크면 Down을 출력하고
+
+답을 맞추면 맞춘 횟수를 출력해주고 메뉴로 돌아갑니다.
+
+최고 점수를 best변수에 저장하여 메뉴에서 2번을 누르면
+
+최고 점수를 출력합니다.
+
+*/
