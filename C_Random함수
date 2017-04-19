@@ -1,0 +1,69 @@
+1. 랜덤값
+
+random 함수는 초기값을 지정하는데 이때 초기값을 지정하기 위해 
+time.h파일을 전처리 해야한다. 
+srand() 라는 초기값 설정 함수에 time(NULL)을 포함시켜 매번 다르게 설정한다.
+초기값 설정후 랜덤값을 rand() 함수로 호출한다.
+
+*/
+
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <time.h>
+
+
+int main()
+{
+ 
+     int i, data;
+     srand( time(NULL) );
+
+     for(i=0;i <5;i++)
+    {
+       data=rand(); 
+       printf("random : %d\n",data);
+    
+     }
+
+
+    return 0;
+}
+
+
+/*
+2. 랜덤값의 범위 설정
+
+2번에서 배웠던 소스에
+
+rand() 함수에 나머지를 구할 수 있는 %45를 추가해 범위를 지정한다.
+나머지 값에는 0이 포함되지 않게 하기위해서는 rand()%45+1을 하여
+전체의 값을 1증가시킨다.
+*/
+
+
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <time.h>
+
+int main()
+{
+ 
+    int i, data;
+    srand( time(NULL) );
+
+ for(i=0;i <5;i++)
+    {
+        data=rand()%45; 
+        printf("random : %d\n",data);
+
+    }
+
+
+   return 0;
+}
+
+
+
+
