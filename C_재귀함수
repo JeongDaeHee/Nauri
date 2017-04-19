@@ -1,0 +1,142 @@
+/*
+자기 자신을 참조하는 함수를
+
+재귀함수 라고 부른다.
+*/
+
+#include <stdio.h>
+
+int fact(int n)
+{
+     if(n==1) return 1;
+     else return (n*fact(n-1));
+}
+
+// 다음의 형태와 같이 함수 안에 자기 자신을 참조하는 함수이다.
+
+//1. 재귀함수 예제 1
+#include <stdio.h>
+
+int fact(int n)
+{
+ if(n==1) return 1;
+ else return (n*fact(n-1));
+
+}
+
+void main()
+{
+ int x = 5;
+ printf("\n %d!의 값은 %d이다.\n",x,fact(x));
+
+}
+
+/*
+자기 자신을 참조하는 함수는 꼭 써야하는 것은 아니지만
+
+추후에 고민을 하던 중 코드를 쓰면 편하겠다는 생각을
+
+할 수 있다면 충분하다.
+*/
+
+//2. 재귀함수 예제 2
+
+#include <stdio.h>
+
+int sum(int su)
+{
+ if(su==1) return 1;
+ else return su+sum(su-1);
+
+}
+
+int main()
+{
+ int su;
+ printf("n의 수를 입력하세요 : ");
+ scanf("%d",&su);
+
+ printf("n까지의 합 : %d \n",sum(su));
+ return 0;
+
+}
+
+/*
+재귀함수는 자료구조에 연결리스트라는 것을 구현할 때
+
+자기 참조 구조체라는 것을 쓰며 많이 사용된다.
+
+하지만 실제로는 반복문과 다르지 않기 때문에
+
+반복문을 사용하는 것이 더 효율적이다.
+
+자료구조를 공부한다면 코드를 읽는 방법과 개념을
+
+명확히 이해하도록 하자.
+*/
+
+/*3. 간접재귀함수 예제 2
+
+다음은 간접 재귀함수이다.
+
+어떤 함수내에서 다른 함수를 호출하고
+
+그 함수는 다시 그 전의 함수를 호출하는 형태로
+
+어디에 쓰이는지 정확히 모르겠지만
+
+개념과 코드를 읽을 수 있는 능력은 구비하도록 하자.
+*/
+
+#include <stdio.h>
+int count=0;
+int func(int data);
+int func2(int data);
+
+int main()
+{
+ int a=10;
+ printf("%d \n", func(a));
+ return 0;
+}
+int func(int data)
+{
+ count++;
+ data = 100;
+ if(count==4) return data;
+ func2(data);
+ return data;
+}
+int func2(int data)
+{
+ count++;
+ data = 200;
+ if(count==4) return data;
+ func(data);
+ return data;
+}
+
+/*
+
+위쪽에 코드에서 count처럼 함수의 영역 이외에서 쓰여서
+
+모든 함수에서 사용할 수 있게 만든 변수가 바로
+
+전역변수 이다.
+*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
