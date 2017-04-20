@@ -1,0 +1,206 @@
+Endian
+
+
+little endian 과 big endian이 있는데
+
+
+
+리틀 엔디안의 경우에는 우리가 일반적으로 사용하는 컴퓨터에서 쓰이고
+
+빅 엔디안의 경우에는 네트워크에서 사용하는 방식이다
+
+따라서 네트워크로 나갈 경우 주소를 맞춰 주기 위해
+
+라디안을 맞춰줄 수 있는 함수를 만들어져 있다
+
+htons()  // host - to - network - short       //short은 2바이트 정수형 변수
+                                                // 리틀 에디안을을 빅 에디안으로으로 바꿔주는 방식
+
+htonl()  //  host - to - network, - long       //long은 정수의 4바이트 형태
+                                                // 리틀 에디안을을 빅 에디안으로으로 바꿔주는 방식
+
+ntohs()  // network - to - host - short       //short은 2바이트 정수형 변수
+                                                       // 빅 엔디안을 리틀 엔디안으로 바꿔주는 방식
+
+ntohl()  //  network - to - host, - long       //long은 정수의 4바이트 형태
+                                                        // 빅에디안을 리틀 에디안으로 바꿔주는 방식
+
+Endian 예제 1
+
+
+
+#pragma comment(lib, "ws2_32")
+#include <winsock2,h>
+#include <stdio.h>
+
+int main(int argc, char *argv[]){
+                          
+                       short x1 = 0x1234;
+                       int y1 = 0x12345678;
+
+                       printf("[호스트 바이트 -> 네이워크 바이트]\n");
+                       printf("0x%x -> 0x%x\n", x1, htons(x1));
+                       printf("0x%x -> 0x%x\n", y1, htonl(y1));
+                       return 0;
+}
+
+x1을 그대로 입력했을 때에는 0x1234가 나오지만 호스트 방식으로 나타낼 경우
+
+0x3412라는 방식으로 나타난다.
+
+y1을 그대로 입력했을 때에는 0x12345678이 나오지만 호스트 방식의 경우
+
+0x78563412라는 값이 나온다.
+
+
+Endian 예제 2
+
+
+
+#pragma comment(lib, "ws2_32")
+#include <winsock2,h>
+#include <stdio.h>
+
+int main(int argc, char *argv[]){
+                          
+                       short x1 = 0x1234, x2;
+                       int y1 = 0x12345678, y2;
+
+                       x2 = htons(x1);
+                       y2 = htonl(y1);
+
+                       printf("[네트워크 바이트 -> 호스트 바이트]\n");
+                       printf("0x%x -> 0x%x\n", x2, ntohs(x2));
+                       printf("0x%x -> 0x%x\n", y2, ntohl(y2));
+                       return 0;
+}
+
+다음 예제는 네트워크 바이트에서 호스트 바이트로 바뀌는 방식을 설명했다.
+
+우선 x2 와 y2에는 각각 빅엔디안 방식의 바이트 주소가 저장될 것이다.
+
+x2 에틑 0x78563412라는 값이 y2에는 0x3412라는 값이 저장된다.
+
+다음의 값을 호스트 바이트 값으로 변환해줄 경우
+
+처음의 x1과 결과값이 같이 나올 것이다.
+
+IP 주소 변환 함수
+
+
+문자열 형태의 ip주소를 32비트 숫자로 전환해주는 함수.
+
+unsigned long inet_addr(char *cp)
+
+정수와 점의 문자열 ip주소를 변환해준다.
+
+반대의 개념에서는
+
+inet_ntoa(struct in_aadr in);
+
+IP 변환 함수 예제 1
+
+
+#pragma comment(lib, "ws2_32")
+#include <winsock2.h>
+#include <stdio.h>
+
+int main(int argc, char * argv[]){
+                     
+                       char * ipv4 = "192.168.1.1";
+                       printf("변환 전 : %s\n", ipv4);
+                       printf("변환 후 : %d\n", inet_addr(ipv4));
+
+                       IN_ADDR ipv4_su;
+                       ipv4_su.s_addr = inet_addr(ipv4);
+                       printf("재 변환 : %s\n", inet_nota(ipv4_su));
+                       return 0;
+
+}
+
+inet_addr("정수와 점으로 된 ip주소 ex) 192.168.10.20")
+
+inet_ntoa("32비트 숫자로 된 ip 주소")
+
+IN_ADDR 의 s_addr이란 곳에는 32비트 숫자로 된 ip를 넣을 수 있다.
+
+따라서 문자열을 직접입력하는 것이 아니라
+
+inet_addr(ipv4)라는 정수로 변환된 값을 저장한다.
+
+다시 변환할 때에는 inet_ntoa()함수를 사용.
+
+Window Socket
+
+소프트웨어적인 의미
+
+네트워크 통신시 운영체제와 협력이 필요하다.
+
+소켓 통신을 하기 위해서는 다음과 같은 절차를 거쳐야 한다.
+
+
+서버 : 소켓을 생성 -> 주소 할당 -> 연결 대기
+
+클라이언트 : 소켓을 생성 -> 연결 요청
+
+통신 가능
+
+통신 후 통신 끊기
+
+
+네트워크 통신을 하는 것은 전화 개통하는 것과 비슷하다.
+
+최초로 우리가 하는 행동을 전화를 구매한다.
+
+후에 전화번호 할당을 해야 전화를 할 수 있고
+
+후에 전화를 기다리는 것이다.
+
+보내는 쪽에서 전화를 구매한 뒤 전화를 걸면 된다.
+
+연결이 된 이후에는 통신을 할 수 있다.
+
+통신을 다 한 후에는 통신을 끊는 순서이다.
+
+
+※ WSAStartup() 함수
+
+DLL을 초기화 한다고 표현한다. DLL의 값을 메모리에 load시킨다.
+
+우선적으로 시작해야할 함수이다.
+
+int WSAStartup(
+                   WORD wVersionRequested,// 2바이트 정수 버전 정보를 가지고 있는 변수
+                                                      // 우리는 여기서 2.2버전을 사용한다.
+                   LPWSADATA IpWSAData
+);
+
+DLL을 로드시킨다고 해서 사용했기 때문에 
+
+올려놓은 DLL을 
+
+WSAcleanup을 해서 다시 unload시켜줘야 한다.
+
+WSA 예제 1
+
+
+#pragma comment(lib, "ws2_32")
+#include <winsock2.h>
+#include <stdio.h>
+
+int main()
+{
+                 WSADATA wsa;
+                 WSAStartup(MAKEWORD(2,2), &wsa);  //MAKEWORD라는 것을 사용해
+                                                                   //version 정보를 wsa 구조체에 넣음
+
+                 printf("winsock start");
+
+                 WSAcleanup();    // DLL 업로드를 다시 unload시켜준다.
+ 
+                 return 0;
+}
+
+
+
+
