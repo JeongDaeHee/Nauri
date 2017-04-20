@@ -1,0 +1,132 @@
+1. fread 함수
+
+
+fread(buffer, sizeof(char),12,fp);
+
+fp에 있는 파일을 char사이즈만큼 12번 반복하여 buffer라는 값에 넣어주겠다.
+
+fwrite(buffer, sizeof(char), 3, fp)
+
+1바이트(char 변수 바이트) 를 3번 반복해서 버퍼에 있는 것을 fp에 써넣겠다.
+
+1. fread & fwrite 예제 1
+
+#include <stdio.h>
+#define BUF_SIZE 1024
+
+int main(){
+
+                   FILE *src = fopen("c:\\test\\src.txt", "rb");
+                   FILE *dst = fopen("c:\\test\\dst.txt", "wb");
+                   char str[BUF_SIZE];
+                   if( src == NULL || dest == NULL)           {
+                                   printf("파일 NO OPEN!!\n");
+                                   return 0;
+                       }
+                   fseek(src , 0 , SEEK_END); // 커서 위치를 이동시키는것
+                                                    // SEEK_END는 파일의 끝을 의미한다.
+                   int size = ftell( src );       // 현재 파일에서 커서까지의 크기 리턴.
+
+                   //fseek(src , 0 , SEEK_SET);  이러한 값이 들어가지 않으면 에러가 난다.
+
+                   fread(str , 1 , size , src);   // 현재 커서 위치는 맨끝이기 때문에 쓰레기값
+                   fwrite(str, 1 , size , dst);   // 알 수 없는 값을 쓰게 된다.
+
+                   fclose(src);
+                   fclose(dst);
+
+                   return 0;
+
+}
+
+다음을 동적할당으로 바꾸어라
+
+1. fread & fwrite 예제 2
+
+ 
+
+                  fseek(src , 0 , SEEK_END); // 커서 위치를 이동시키는것
+                                                    // SEEK_END는 파일의 끝을 의미한다.
+                   int size = ftell( src );       // 현재 파일에서 커서까지의 크기 리턴.
+
+                   fseek(src , 0 , SEEK_SET);  이러한 값이 들어가지 않으면 에러가 난다.
+
+                   char *pc;
+ 
+                   pc = (char*)malloc(size);
+
+                   fread(pc , 1 , size , src);   // 현재 커서 위치는 맨끝이기 때문에 쓰레기값
+                   fwrite(pc, 1 , size , dst);   // 알 수 없는 값을 쓰게 된다.
+                   free(pc)
+                   fclose(src);
+                   fclose(dst);
+
+                   return 0;
+
+위 소스 중 다음과 같이 char형 변수의 선언만 동적할당으로 바꾸어 주면 된다.
+
+
+1. fread & fwrite 예제 3
+
+
+typedef struct st{
+                         char name[20];
+                         char addr[50];
+                         int age;
+}ST;
+
+
+
+int main(){
+     
+                  ST *p;
+                  FILE * fp = ("c:\\test\\test.txt", "w");
+                  p = func();
+
+                  fwrite(p -> name, sizeof(char) , strlen[p -> name] , fp);
+                  fprint("fp,"\n");
+                  fwrite(p -> addr, sizeof(char) , strlen[p -> addr] , fp);
+                  fprintf(fp , "\n%d\n", p -> age);
+
+                  fclose(fp);
+                  free(p);
+                 
+                 return 0;
+
+}
+
+
+ST * func()
+{
+                ST * p = (ST*)malloc(sizeof(ST));
+                printf(" 이름 : ");
+                scanf("%s" , p -> name);
+                printf(" 주소 : ");
+                scanf("%s" , p -> addr);
+                printf(" 나이 : ");
+                scanf("%d" , &p -> age);
+                return p;
+}
+
+
+파일을 값을 입력받기 위해 func()라는 함수를 선언하고 값을 받을 수 있도록 한다.
+
+값을 받기 위해 미리 ST 구조체 모양의 포인터를 동적 할당 하여 공간을 마련하고
+
+각 값을 받은 후에 저장 공간에 저장한다.
+
+메인 함수로 돌아와서 구조체 변수 fp에 정보를 쓰기 위해 fopen 함수를 통해
+
+쓰기 모드로 열어준다.
+
+func() 함수를 통해서 p에 값을 입력 받은 후에 저장한다.
+
+p의 저장한 값을 파일에 쓰기 위해 fwrite 함수를 호출하여 p의 구조체의
+
+name, addr, age를 불러와 파일에 써준다. 개행을 위해 \n을 넣는 것을 잊지 않는다.
+
+마지막으로 동적 할당된 p와 파일 포인터 fp를 닫아주며 프로그램을 마친다.
+
+결과 적으로 값을 입력 받아 c:\test.txt 라는 파일(없을 경우 생성)에 입력받은 
+
+이름, 주소, 나이를 입력해주는 프로그램을 만들었다
