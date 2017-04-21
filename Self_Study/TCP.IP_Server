@@ -1,0 +1,83 @@
+TCP/IP Server 코드
+
+#pragma comment ( lib , "ws2_32.lib")
+#include <winsock2.h>
+#include <stdio.h>
+
+int main(){
+
+              WSADATA wsa;
+              WSAStartup( MAKEWORD(2,2) , &wsa );
+
+              SOCKET SRVs;
+              SRVs = socket(AF_INET , SOCKET_STREAM , 0);
+              if( SRVs == INVALID_SOCKET){
+                             printf("SOCKET ERROR!!");
+                             return 0;
+              }
+
+              SOCKADDR_IN SRVAddr;
+    
+              memset(&SRVAddr , 0 , sizeof(SRVAddr)) //초기화 작업을 한다.
+                 /* 
+                     첫 번째 인자는 초기화 할 주소의 주소값을 입력하고
+                     두 번째 인자에는 초기화할 값을 입력하고
+                     세 번째 인자에는 주소의 크기를 입력해준다.
+                  */
+
+               int errorCheck;
+               SRVAddr.sin_family = AF_INET;
+               SRVAddr.sin_prot = htons(22222);
+               SRVAddr.sin_addr.S_un.S_addr = inet_addr("192.168.222.131");
+               // SRVAddr에 포트 번호와, 통신할 type, IP주소를 할당한다.
+
+                errorCheck = bind(SRVs, (sockaddr *)(&SRVAddr),sizeof(SRVAddr));
+
+                  //bind의 두 번째 인자값은 sockaddr 포인터 형태이기 때문에
+                  //우리가 입력한 값을 sockaddr의 형태로 바꾸어 주겠다는 것.
+
+                if(errorCheck == SOCKET_ERROR){
+                         
+                            printf("BIND ERROR!!\n");
+                            return -1;
+                 }
+
+                 errorCheck = listen(SRVs,SOMAXCONN);
+
+          // 연결을 받을 소켓을 첫 번째 인자
+          // 받을 최대 길이를 두 번째 인자에 넣는데 우리는 정해진 SOMAXCONN을 쓴다.
+                 if(errorCheck == SOCKET_ERROR){
+                                  printf("LISTEN ERROR!!\n");
+                                  return -1;
+                   }
+
+            SOCKET CiTs;
+
+            SOCKADDR_IN CiTAddr;
+            memset(&CiTAddr , 0 , sizeof(CiTAddr));
+            int CiTLen = sizeof(CiTLen);
+
+            CiTs = accept( SRVs , (sockaddr *)(&CiTAddr) , &CiTlen );
+                    // 연결을 받아들일 소켓을 첫 번째 인자.
+                   // 연결 요청을 해온 클라이언트 주소값을 저장할 두번째 인자.
+                   // 두 번째 인자의 길이를 나타낸 세 번째 인자.
+            if(CiTs == INVALID_SOCKET){
+                            printf("ACCEPT ERROR!!\n");
+                            return -1;
+             }
+
+             char buf[100];
+             int recvSize;
+             memset(buf , 0 , 100);
+             recvSize = recv(CiTs , buf , sizeof(buf) , 0);
+             printf("수신 데이터 : %s\n", buf);
+             printf("수신 데이터의 크기 : %d\n", recvSize);
+
+             closesocket(SRVs);
+             WSAcleanup();
+
+             return 0;
+       
+}
+
+
