@@ -1,0 +1,50 @@
+
+#paragma comment ( lib , "ws2_32.lib" )
+#include <winsock2.h>
+#include <stdio.h>
+
+int main(){
+
+               WSADATA wsa;
+               WSAStartup(MAKEWORD(2,2) , &wsa);
+
+               SOCKET client_socket;
+               client_socket = socket(AF_INET , SOCK_STREAM , 0);
+               if(client_socket == INVALID_SOCKET){
+                                  printf("SOCKET ERROR!!\n");
+                                  return -1;
+                }
+
+                SOCKADDR_IN server_addr;
+                int errorcheck;
+                memset(&server_addr, 0 , sizeof(server_addr));
+                server_addr.sin_addr.s_addr = inet_addr("192.168.222.131");
+                server_addr.sin_port = htons(22222);
+                server_addr.sin_family = AF_INET;
+
+                errorcheck = connect(client_socket , (sockaddr*)(&server_addr)
+                                  , sizeof(server_addr));
+
+                if(errorcheck == SOCKET_ERROR){
+                                   printf("CONNECT ERROR!!\n");
+                                   return -1;
+                         }
+
+                char buf[100] = "HELLO SOCKET";
+                int sendSize;
+                sendSize = send(client_socket , buf , sizeof(buf) , 0);
+                printf(" %d byte 전송 완료! \n", sendSize);
+
+                closesocket(client_socket);
+                WSAcleanup();
+
+                return 0;
+
+}
+
+
+
+
+
+
+ 
