@@ -1,0 +1,93 @@
+소켓 관련 함수(서버)
+
+
+
+socket(int af, int type, int protocol)
+
+반환 자료형은 SOCKET이라는 구조체로 반환
+
+첫번째 af는 주소체계 즉 ipv4인지 ipv6인지를 정한다.
+
+ipv4 = AF_INET
+
+ipv6 = AF_INET6
+
+라는 인자를 사용한다.
+
+두번째 type은 UDP 혹은 TCP의 전송계층을 결정하는 인자이다.
+
+TCP = SOCK_STREAM
+
+UDP = SOCK_DGRAM
+
+라는 인자를 사용한다.
+
+세번째는 사용 프로토콜을 지정하는데 이미 type에 설정하였기 때문에
+
+0으로 하여도 defalt 값으로 들어간다
+
+
+closesocket(SOCKET s)
+
+인자로 닫을 소켓의 구조체를 넣어주면 된다.
+
+
+소켓 예제 1
+
+#pragma comment (lib, "win2_32");
+#include <winsock2.h>
+#include <stdio.h>
+
+int main(){
+          
+                    WSADATA wsa;
+                    SOCKET tcp_socket;
+ 
+                    WSAStartup(MAKEWORD(2,2) , &wsa);
+                    
+                    tcp_socket = socket(AF_INET , SOCK_STREAM , 0);
+
+                    if(tcp_socket == INVAILD_SOCKET){           //예외처리 if문
+                                  printf("소켓 에러!!");
+                                  return 0;
+                                 }
+
+
+                        printf("소켓 성공");
+    
+                      closesocket(tcp_socket);
+
+                      WSAcleanup();     // DLL을 unload한다.
+
+                return 0;
+}
+
+SOCKETADDR 구초제
+
+struct sockaddr{
+                        u_short sa_family;           // 사용할 ip의 버젼 AF_INET을 넣어준다.
+                        hcar sa_data[14];            // 처음 2바이트에는 포트번호를 
+                                                         // 다음 4바이트에는 ip번호를 넣어준다.
+};
+typedef struct sockaddr SOCKADDR;
+
+sockaddr_in 구초제
+
+struct sockaddr_in{
+                               short                  sin_family;           //ip의 버전 AF_INET
+                               u_short               sin_port;             //접속 port번호
+                               struct in_addr       sin_addr;            //참조 구조체
+                               char                   sin_zero[8];
+};
+typedef struct sockaddr_in SOCKADDR_IN;
+
+struct in_addr{
+       union {
+                 struct { u_char s_b1 , s_b2 , s_b3 , s_b4 ; } S_un_b;
+                 struct { u_short s_w1 , s_w2 ; } S_un_w;
+                 u_long S_addr;                                 //실제 ip주소 저장 공간
+          } S_un;
+#define s_addr S_un.S_addr           //간단하게 s_addr로 사용하기 위해 정의
+};
+typedef struct in_addr IN_ADDR;
+
