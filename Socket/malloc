@@ -1,0 +1,15 @@
+int main()
+{
+        struct B *p;
+        p = (struct B *)malloc(sizeof( struct B) );
+
+        (*p).a.a = 10;
+        p->a.b = 20;
+        p->b = 30;
+
+        free(p);
+
+
+        return 0;
+
+}
