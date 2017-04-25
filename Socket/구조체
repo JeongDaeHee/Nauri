@@ -1,0 +1,44 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <malloc.h>
+
+struct A
+{
+	int* a;
+	int* b;
+};
+
+struct C
+{
+	struct A a;
+	int b;
+};
+
+
+int main()
+{
+	struct C *p;
+	p = (struct C *)malloc(sizeof( struct C) );
+
+    p->b = 300;
+	p->a.a = (int*)malloc(sizeof(int));
+	p->a.b = (int*)malloc(sizeof(int));
+
+	*(p->a.a) = 100;
+	*(p->a.b) = 200;
+
+
+	printf("%d\n" , p->b);
+	printf("%d\n" , *(p->a.a));
+	printf("%d\n" , *(p->a.b));
+
+
+	free(p->a.a);
+	free(p->a.b);
+	free(p);
+
+
+	return 0;
+
+}
