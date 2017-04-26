@@ -40,6 +40,7 @@ int main()
 
 	printf("data1 : %d\n" , p->data1);
 	printf("data2 : %d\n" , p->data2);
+	free(p);
 	return 0;
 }
 
