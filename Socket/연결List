@@ -1,0 +1,71 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+typedef struct node
+{
+	int data;
+	struct node * link;
+}Linklist;
+
+Linklist * get_node()
+{
+	Linklist * p;
+	p = (Linklist *)malloc( sizeof(Linklist) );
+	p->link = NULL;
+
+	return p;
+}
+
+void InsertNode(Linklist ** head, int data)
+{
+	if(*head == NULL)
+	{
+		*head = get_node();   
+		(*head)->data = data;
+		return;
+	}
+
+	InsertNode(&(*head)->link, data);
+}
+
+
+
+void DeleteNode(Linklist** head, int data)
+{
+
+	Linklist* temp = (*head);
+	Linklist* preNode = NULL;
+
+	if((*head)->data == data)
+	{
+		(*head) = temp->link;
+		free(temp);
+	}
+	else
+	{
+		while(temp != NULL)
+		{
+			if(temp->data == data)
+			{
+				preNode->link = temp->link;
+				free(temp);
+				break;
+			}
+			preNode = temp;
+			temp = temp->link;
+		}
+	}
+
+	
+}
+
+int main()
+{
+	Linklist * head = NULL;
+
+	InsertNode(&head,10);
+	InsertNode(&head,20);
+	InsertNode(&head,30);
+
+	return 0;
+}
