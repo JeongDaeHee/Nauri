@@ -1,0 +1,16 @@
+void DeleteNode(Linklist ** head , int data)
+{
+	Linklist * tmp;
+	if(*head == NULL)
+		return;
+	else
+	{
+		if((*head)->data == data)
+		{
+			tmp = (*head)->link;
+			free(*head);
+			*head = tmp;
+		}
+		else DeletNode(&(*head)->link,data);
+	}
+}
