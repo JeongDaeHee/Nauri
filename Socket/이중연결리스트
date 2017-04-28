@@ -1,0 +1,83 @@
+#include <stdio.h>
+#include <malloc.h>
+
+struct node
+{
+	struct node * PreNode;
+	int data;
+	struct node * NextNode;
+};
+typedef struct node DLinkList;
+
+DLinkList* get_list()
+{
+	DLinkList* p = (DLinkList*)malloc(sizeof(DLinkList));
+	p->NextNode = NULL;
+	p->PreNode = NULL;
+
+	return p;
+}
+
+void addNode(DLinkList** head, int pre_data, int input_data)
+{
+	DLinkList* temp = (DLinkList*)malloc(sizeof(DLinkList));
+
+	if((*head)->data == pre_data)
+	{
+		temp->data = input_data;
+		temp->NextNode = (*head)->NextNode;
+		(*head)->NextNode->PreNode = temp;
+		temp->PreNode = *head;
+		(*head)->NextNode = temp;
+		return;
+	}
+
+		addNode(&(*head)->NextNode , pre_data , input_data);
+
+}
+
+
+void InsNode(DLinkList** head, int data)
+{
+	if((*head) == NULL)
+	{	
+		*head = get_list();
+		(*head)->PreNode = *head;
+		(*head)->data = data;
+		return;
+	}
+
+	InsNode(&(*head)->NextNode , data);
+
+}
+
+void delNode(DLinkList** head, int data)
+{
+	DLinkList* del = (DLinkList*)malloc(sizeof(DLinkList));
+	
+	if((*head)->data == data)
+	{
+		del = *head;
+		*head = (*head)->NextNode;
+		(*head)->NextNode->PreNode = *head;
+		free(del);
+		return;
+	}
+		
+	delNode(&(*head)->NextNode , data);	
+
+}
+
+int main()
+{
+	DLinkList * head = NULL;
+
+	InsNode(&head, 10);
+	InsNode(&head, 20);
+	InsNode(&head, 30);
+	InsNode(&head, 40);
+
+	addNode(&head,20 ,25);
+	return 0;
+
+}
