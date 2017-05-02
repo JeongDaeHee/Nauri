@@ -1,0 +1,239 @@
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <conio.h>
+
+typedef struct node
+{
+	int num;
+	char name[10];
+	int kor;
+	int	eng;
+	int	math;
+	int	sum;
+	double aver;
+	struct node * link;
+}Linklist;
+
+Linklist * get_node()
+{
+	Linklist * p;
+	p = (Linklist *)malloc( sizeof(Linklist) );
+	p->link = NULL;
+
+	return p;
+}
+
+
+void correctNode(Linklist ** head, int num)
+{
+
+	if(*head == NULL)
+		return;
+	else
+	{
+		if((*head)->num == num)
+		{
+
+		printf("학생 이름 : ");
+		scanf("%s",(*head)->name);
+		printf("%s 학생 국어 : ",(*head)->name);
+		scanf("%d",&(*head)->kor);
+		printf("%s 학생 영어 : ",(*head)->name);
+		scanf("%d",&(*head)->eng);
+		printf("%s 학생 수학 : ",(*head)->name);
+		scanf("%d",&(*head)->math);
+		(*head)->sum = ((*head)->math) + ((*head)->eng) + ((*head)->kor);
+		(*head)->aver = ((*head)->sum) / 3.0;
+		return;
+	}
+
+		else
+			correctNode(&(*head)->link, num);
+	}
+}
+
+void searchNode(Linklist ** head, char* name)
+{
+
+
+	if(! strcmp((*head)->name,name))
+	{
+		printf("%8s%8s%8s%8s%8s%8s%8s\n","번호","이름","국어","영어","수학","합계","평균");
+		printf("%8d%8s%8d%8d%8d%8d%8.2lf\n",(*head)->num,(*head)->name,(*head)->kor,(*head)->eng,(*head)->math,(*head)->sum,(*head)->aver);		
+		return;
+	}
+	else
+	{
+			searchNode(&(*head)->link, name);
+	}
+}
+
+
+void DeleteNode(Linklist ** head, int num)
+{
+	Linklist * tmp;
+	if(*head == NULL)
+		return;
+	else
+	{
+		if((*head)->num == num)
+		{
+			tmp = (*head)->link;
+			free(*head);
+			*head = tmp;
+		}
+		else DeleteNode(&(*head)->link, num);
+	}
+}
+
+void InsertNode(Linklist ** head, int num)
+{
+	if(*head == NULL)
+	{
+		*head = get_node();
+		(*head)->num = num;
+		printf("학생 이름 : ");
+		scanf("%s",(*head)->name);
+		printf("%s 학생 국어 : ",(*head)->name);
+		scanf("%d",&(*head)->kor);
+		printf("%s 학생 영어 : ",(*head)->name);
+		scanf("%d",&(*head)->eng);
+		printf("%s 학생 수학 : ",(*head)->name);
+		scanf("%d",&(*head)->math);
+		(*head)->sum = ((*head)->math) + ((*head)->eng) + ((*head)->kor);
+		(*head)->aver = ((*head)->sum) / 3;
+
+		return;
+	}
+	InsertNode(&(*head)->link, num);
+}
+
+void AddNode(Linklist ** head, int num)
+{
+	Linklist* newNode = NULL;
+
+	if((*head)->num == num)
+		{
+			InsertNode(&newNode,num);
+
+			newNode->link = (*head);
+			(*head) = newNode;
+			newNode->link->num = (num+1);
+		}
+	else 
+		AddNode(&(*head)->link, num);
+}
+
+void printNode(Linklist ** head)
+{
+	if((*head) == NULL)
+		return;
+
+		printf("%8d%8s%8d%8d%8d%8d%8.2lf\n",(*head)->num,(*head)->name,(*head)->kor,(*head)->eng,(*head)->math,(*head)->sum,(*head)->aver);		
+		printNode(&(*head)->link);
+}
+
+
+
+int main()
+{
+		char name[10];
+		int basic_num = 1000;
+		int flag;
+		int num;
+		Linklist* head = NULL;
+
+
+		while(1){
+			system("cls");
+			printf("<< === student Manager === >>\n");
+			printf("1. 학생 정보 출력\n");
+			printf("2. 학생 정보 입력\n");
+			printf("3. 학생 정보 수정\n");
+			printf("4. 학생 정보 삭제\n");
+			printf("5. 학생 정보 삽입\n");
+			printf("6. 학생 정보 검색\n");
+			printf("7. 학생 정보 종료\n");
+			printf("선택 : ");
+			scanf("%d",&flag);
+
+			if(flag == 1)
+			{
+				if(head == NULL)
+				{
+					printf("No data!!");
+					getch();
+				}
+				else
+				{
+					printf("<< === 학생 정보 출력 === >>\n");
+					printf("%8s%8s%8s%8s%8s%8s%8s\n","번호","이름","국어","영어","수학","합계","평균");
+					printNode(&head);
+					printf("계속하려면 아무 키나 누르십시오 . . .");
+					getch();
+				}
+			}
+
+			if(flag == 2)
+			{
+				InsertNode(&head,basic_num);
+				basic_num++;
+				printf("입력이 완료 되었습니다.\n");
+				printf("계속하려면 아무 키나 누르십시오 . . .\n");
+				getch();
+			}
+
+
+			if(flag == 3)
+			{
+				printf("수정 할 학생 번호를 입력하세요 : ");
+				scanf("%d",&num);
+				correctNode(&head,num);
+				printf("계속하려면 아무 키나 누르십시오 . . .");
+				getch();				
+			}
+			if(flag == 4)
+			{
+				printf("삭제 할 학생 번호를 입력하세요 : ");
+				scanf("%d",&num);
+				DeleteNode(&head,num);
+				printf("계속하려면 아무 키나 누르십시오 . . .");
+				getch();				
+			}
+			if(flag == 5)
+			{
+				printf("번호 선택 : ");
+				scanf("%d",&num);
+				if(head == NULL){
+					printf("NO data!!\n");
+				}
+				else{
+				AddNode(&head,num);
+				printf("입력이 완료되었습니다.\n");
+				printf("계속하려면 아무 키나 누르십시오 . . .");
+				getch();
+				}
+			}
+			if(flag == 6)
+			{
+				printf("찾을 학생의 이름 입력 : ");
+				scanf("%s",name);
+				printf("<< === 학생 정보 출력 === >>\n");
+				printf("%8s%8s%8s%8s%8s%8s%8s\n","번호","이름","국어","영어","수학","합계","평균");
+				searchNode(&head,name);
+				printf("계속하려면 아무 키나 누르십시오 . . .");
+				getch();				
+			}
+			if(flag == 7)
+			{
+				printf("프로그램을 종료합니다.");
+				getch();
+				exit(1);
+			}
+
+		}
+
+	return 0;
+
+}
