@@ -1,0 +1,38 @@
+#include <stdio.h>
+#include <winsock2.h>
+#include <string.h>
+#include <conio.h>
+
+int main(int argc, char* argv[])
+{
+
+          FILE* fp;
+          fp = fopen(argv[1],"a");
+          char ch;
+
+          while(1)
+          {
+            ch = getch();
+
+            if(ch == '0')
+              break;
+
+            if(ch == '\r')
+            {
+              printf("\n");
+              fputc('\n',fp);
+              continue;
+            }
+
+            fprintf(fp,"%c",ch);
+            printf("%c",ch);
+
+
+	}
+
+	fclose(fp);
+
+	return 0;
+
+
+}
