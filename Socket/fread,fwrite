@@ -1,0 +1,36 @@
+#include <stdio.h>
+#include <winsock2.h>
+#include <string.h>
+#include <conio.h>
+
+int main()
+{
+
+        FILE* src = fopen("c:\\test\\src.txt","rb");
+        FILE* dst = fopen("c:\\test\\dst.txt","wb");
+        char ch[1024];
+        int fsize;
+
+        if(src == NULL || dst == NULL)
+        {
+          return 0;
+        }
+
+        fseek(src,0,SEEK_END);
+        fsize = ftell(src);
+
+        fseek(src,0,SEEK_SET);
+
+        fread(ch, 1, fsize,src);
+
+        fwrite(ch, 1, fsize,dst);
+
+
+        fclose(src);
+        fclose(dst);
+
+
+	return 0;
+
+
+}
