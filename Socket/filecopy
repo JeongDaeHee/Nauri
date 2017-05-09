@@ -1,0 +1,28 @@
+#include <stdio.h>
+#include <winsock2.h>
+#include <string.h>
+#include <conio.h>
+
+int main()
+{
+
+        FILE* src = fopen("c:\\test\\src.txt","rt");
+        FILE* dst = fopen("c:\\test\\dst.txt","wt");
+        char ch;
+
+        if(src == NULL || dst == NULL)
+        {
+          return 0;
+        }
+
+        while( (ch = fgetc(src)) != EOF)
+        {
+          fputc(ch,dst);
+        }
+        fclose(src);
+        fclose(dst);
+
+        return 0;
+
+
+}
