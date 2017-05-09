@@ -1,0 +1,29 @@
+#include <stdio.h>
+#include <winsock2.h>
+#include <string.h>
+#include <conio.h>
+
+int main()
+{
+
+      FILE* fp;
+      int i , no = 0, sum = 0;
+
+      fp = fopen("c:\\test\\data.txt","r");
+
+      while( fscanf(fp,"%d",&i)!=EOF )
+      {
+        sum += i ;
+        ++no;
+      }
+
+      printf("Total %d number\n",no);
+      printf("Sum = %d\n",sum);
+      printf("Average = %.2f\n",(float)sum/(float)no);
+
+      fclose(fp);
+
+      return 0;
+
+
+}
