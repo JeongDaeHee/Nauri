@@ -1,0 +1,89 @@
+#include <stdio.h>
+#include <winsock2.h>
+#pragma comment (lib, "ws2_32.lib")
+
+int main()
+{
+	WSADATA wsa;
+	WSAStartup(MAKEWORD(2,2), &wsa);
+
+
+
+	/* 소켓 핸들 */
+	SOCKET s;
+	s = socket(AF_INET, SOCK_STREAM, 0);
+	if(s == INVALID_SOCKET)
+	{
+		printf("socket error!\n");
+		return -1;
+	}
+
+	/* 네트워크 주소 결합 */
+	int error = 0;
+	SOCKADDR_IN srvAddr;
+	memset(&srvAddr, 0, sizeof(srvAddr));
+
+
+	srvAddr.sin_family = AF_INET;
+	srvAddr.sin_port = htons(12345);
+	srvAddr.sin_addr.s_addr = inet_addr("192.168.2.128");
+
+	error =	bind(s, (SOCKADDR *)&srvAddr, sizeof(srvAddr));
+	if(error == SOCKET_ERROR)
+	{
+		printf("bind error!\n");
+		return -1;
+	}
+
+	/* 포트 열기 */
+	error = listen(s, SOMAXCONN);
+	if(error == SOCKET_ERROR)
+	{
+		printf("listen error!\n");
+		return -1;
+	}
+	
+	/* 연결 허용 */
+	SOCKADDR_IN cltAddr;
+	memset(&cltAddr, 0, sizeof(cltAddr));
+	int cltlen = sizeof(cltAddr);
+	SOCKET clts;
+
+	clts = accept(s, (SOCKADDR*)&cltAddr, &cltlen);
+	if(clts == INVALID_SOCKET)
+	{
+		printf("accept error!\n");
+		return -1;
+	}
+
+	/* 데이터 수신 */
+
+	int size;
+	int fsize;
+	int size_len = 0;
+
+	size = recv(clts ,(char*)&fsize , sizeof(fsize) , 0);
+
+	char* buf = (char*)malloc(fsize+1);
+	memset(buf,0,fsize+1);
+
+
+	size = recv(clts , buf , fsize , 0);
+	FILE* fp = fopen("C:\\dstim.jpg", "wb");
+	fwrite(buf , 1 , fsize , fp);
+	fclose(fp);
+
+
+	
+
+
+
+
+	/* 소켓 종료 */
+	closesocket(clts);
+	closesocket(s);
+	WSACleanup();
+	return 0;
+
+
+}
