@@ -1,0 +1,70 @@
+#include <stdio.h>
+#include <winsock2.h>
+#pragma comment (lib, "ws2_32.lib")
+
+int main()
+{
+	WSADATA wsa;
+	WSAStartup(MAKEWORD(2,2), &wsa);
+
+
+	/* 소켓 핸들 */
+	SOCKET s;
+	s = socket(AF_INET, SOCK_STREAM, 0);
+	if(s == INVALID_SOCKET)
+	{
+		printf("socket error!\n");
+		return -1;
+	}
+	
+	/* 서버 연결 */
+	SOCKADDR_IN srvAddr;
+	memset(&srvAddr, 0, sizeof(srvAddr));
+
+	srvAddr.sin_addr.s_addr = inet_addr("192.168.2.128");
+	srvAddr.sin_port = htons(12345);
+	srvAddr.sin_family = AF_INET;
+	
+	int error = 0;
+	error = connect(s, (SOCKADDR*)&srvAddr, sizeof(srvAddr));
+	if(error == SOCKET_ERROR)
+	{
+		printf("connect error!\n");
+		return -1;
+	}
+
+
+	int cl[3];
+	memset(cl , 0 , sizeof(cl));
+	char inform[100];
+	memset(inform , 0 , sizeof(inform));
+	int size;
+
+
+	while(1){
+
+	printf(" INPUT BALL : ");
+	scanf("%d%d%d",&cl[0],&cl[1],&cl[2]);
+
+	for(int i = 0 ; i <3 ; i++)
+	{
+		size = send(s ,(char*)(&cl[i]) , sizeof(int) , 0);
+	}
+	
+		size = recv(s , inform , sizeof(inform) , 0);
+		printf("%s\n" , inform);
+
+
+		if(!strcmp(inform,"3 strike , 0 ball"))
+			break;	
+
+
+	}
+
+
+
+	/* 소켓 종료 */
+	closesocket(s);
+	WSACleanup();
+	return 0;
+}
