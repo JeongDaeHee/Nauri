@@ -1,0 +1,116 @@
+#include <stdio.h>
+#include <winsock2.h>
+#pragma comment (lib, "ws2_32.lib")
+
+int main()
+{
+	WSADATA wsa;
+	WSAStartup(MAKEWORD(2,2), &wsa);
+
+
+	/* 소켓 핸들 */
+	SOCKET s;
+	s = socket(AF_INET, SOCK_STREAM, 0);
+	if(s == INVALID_SOCKET)
+	{
+		printf("socket error!\n");
+		return -1;
+	}
+	
+	/* 서버 연결 */
+	SOCKADDR_IN srvAddr;
+	memset(&srvAddr, 0, sizeof(srvAddr));
+
+	srvAddr.sin_addr.s_addr = inet_addr("192.168.2.128");
+	srvAddr.sin_port = htons(12345);
+	srvAddr.sin_family = AF_INET;
+	
+	int error = 0;
+	error = connect(s, (SOCKADDR*)&srvAddr, sizeof(srvAddr));
+	if(error == SOCKET_ERROR)
+	{
+		printf("connect error!\n");
+		return -1;
+	}
+
+		char order[10];
+		char saddr[15];
+		char daddr[15];
+		int size,fsize;
+		char* buf;
+		FILE* fp;
+
+	
+
+while(1)
+	{
+		memset(order , 0 , sizeof(order));
+		memset(saddr , 0 , sizeof(saddr));
+		memset(daddr , 0 , sizeof(daddr));
+
+		printf("명령어 > ");
+		gets(order);
+		size = send(s , order , strlen(order) , 0);
+
+		if(!strcmp(order,"get"))
+		{
+			printf("가져올 파일 위치 > ");
+			scanf("%s" , saddr);
+			printf("저장할 위치 > ");
+			scanf("%s", daddr);
+			size = send(s , saddr , strlen(saddr),0); // 파일 위치 보내기 
+
+			size = recv(s , (char*)&fsize , sizeof(fsize),0); // 크기 받기
+			buf = (char*)malloc(fsize);//받을 데이터공간 할당
+
+			size = recv(s , buf , fsize , 0);
+			fp = fopen(daddr , "wb");
+			fwrite(buf , 1 , fsize , fp);
+			fclose(fp);
+			free(buf);
+			
+		}
+
+		if(!strcmp(order,"put"))
+		{
+			printf("업로드할 파일 위치 > ");
+			scanf("%s" , saddr);
+			printf("서버의 저장 위치 > ");
+			scanf("%s", daddr);
+			size = send(s , daddr , strlen(daddr),0); // 파일 위치 보내기
+			
+			fp = fopen(saddr , "rb");
+			fseek(fp , 0 , SEEK_END);
+			fsize = ftell(fp);
+			size = send(s , (char*)&fsize , sizeof(fsize) , 0); // 크기보내기
+			buf = (char*)malloc(fsize);
+			fseek(fp , 0 , SEEK_SET);
+			fread(buf , 1 ,fsize ,fp);
+
+			size = send(s , buf ,fsize , 0);
+
+			fclose(fp);
+
+		}
+
+
+		if(strstr(order,"dir"))
+		{
+		size = recv(s , (char*)&fsize , sizeof(fsize) , 0);
+		buf = (char*)malloc(fsize);
+		size = recv(s , buf , fsize , 0);
+		printf("%s" ,buf);
+		fclose(fp);
+		continue;	
+		}
+	
+
+		
+
+	}
+
+	/* 소켓 종료 */
+	closesocket(s);
+	WSACleanup();
+	return 0;
+}
