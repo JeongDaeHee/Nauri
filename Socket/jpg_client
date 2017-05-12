@@ -1,0 +1,60 @@
+#include <stdio.h>
+#include <winsock2.h>
+#pragma comment (lib, "ws2_32.lib")
+
+int main()
+{
+	WSADATA wsa;
+	WSAStartup(MAKEWORD(2,2), &wsa);
+
+
+	/* 소켓 핸들 */
+	SOCKET s;
+	s = socket(AF_INET, SOCK_STREAM, 0);
+	if(s == INVALID_SOCKET)
+	{
+		printf("socket error!\n");
+		return -1;
+	}
+	
+	/* 서버 연결 */
+	SOCKADDR_IN srvAddr;
+	memset(&srvAddr, 0, sizeof(srvAddr));
+
+	srvAddr.sin_addr.s_addr = inet_addr("192.168.2.128");
+	srvAddr.sin_port = htons(12345);
+	srvAddr.sin_family = AF_INET;
+	
+	int error = 0;
+	error = connect(s, (SOCKADDR*)&srvAddr, sizeof(srvAddr));
+	if(error == SOCKET_ERROR)
+	{
+		printf("connect error!\n");
+		return -1;
+	}
+
+
+	int size;
+	FILE* fp = fopen("c:\\석양.jpg","rb");
+	fseek(fp , 0 , SEEK_END);
+	int fsize = ftell(fp);
+	fseek(fp , 0 , SEEK_SET);
+	size = send(s, (char*)&fsize , sizeof(fsize),0);
+
+	char* buf = (char*)malloc(fsize);
+	memset(buf, 0, sizeof(buf));
+	fread(buf , 1 , fsize , fp);
+	fclose(fp);
+
+
+
+	size = send(s , buf , fsize , 0);
+	printf("송신 크기 : %d\n" , size);	 
+
+	
+
+	/* 소켓 종료 */
+	closesocket(s);
+	WSACleanup();
+	return 0;
+}
