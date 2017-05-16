@@ -1,0 +1,86 @@
+#include <stdio.h>
+#include <winsock2.h>
+#pragma comment (lib, "ws2_32.lib")
+
+
+int main()
+{
+	WSADATA wsa;
+	WSAStartup(MAKEWORD(2,2) , &wsa);
+
+	SOCKET client_socket;
+	client_socket = socket(AF_INET , SOCK_DGRAM , 0);
+	if(client_socket == INVALID_SOCKET){
+		printf("SOCKET ERROR!");
+		return -1;
+	}
+
+	SOCKADDR_IN server_addr;
+	memset(&server_addr , 0 , sizeof(server_addr));
+	server_addr.sin_family = AF_INET;
+	server_addr.sin_port = htons(12345);
+	server_addr.sin_addr.s_addr = inet_addr("192.168.2.130");
+
+
+
+	
+	int fsize,i=1;
+
+
+
+	FILE* fp = fopen("C:\\겨울.jpg", "rb");
+	fseek(fp, 0 , SEEK_END);
+	fsize = ftell(fp);
+	fseek(fp, 0 , SEEK_SET);
+	sendto(client_socket , (char*)&fsize,sizeof(fsize) , 0 , (SOCKADDR*)&server_addr, sizeof(server_addr));
+
+	char* buf = (char*)malloc(fsize);
+
+	fread(buf , 1  , fsize , fp);
+	printf("fsize : %d\n" , fsize);
+
+	int datasize = 1460;
+	int size = 0;
+	while(1)
+	{
+
+	datasize = sendto(client_socket , &buf[size] , datasize , 0 , (SOCKADDR*)&server_addr, sizeof(server_addr));
+	
+	if(datasize == 0)
+		break;
+
+	size += datasize;
+	fsize -= datasize;
+	if(fsize <= 1460)
+		datasize = fsize;
+
+		printf("send data : %d\n",datasize);
+		printf("send sequence %d complete!\n",i);
+		i++;
+	}
+
+
+
+/* 내 답
+	while(fsize > 1540)
+	{
+		sendto(client_socket , buf , 1540 , 0 , (SOCKADDR*)&server_addr, sizeof(server_addr));
+		buf = &(buf[1540*i]);
+		fsize -= 1540;
+		printf("sequence num %d complete!\n",i);
+		i++;
+
+	}
+
+
+*/
+	free(buf);
+	fclose(fp);
+	closesocket(client_socket);
+	WSACleanup();
+
+
+	
+	return 0;
+		
+}
