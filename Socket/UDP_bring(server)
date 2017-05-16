@@ -1,0 +1,74 @@
+#include <stdio.h>
+#include <winsock2.h>
+#pragma comment (lib , "ws2_32.lib")
+#include <time.h>
+
+
+int main()
+{
+	WSADATA wsa;
+	WSAStartup(MAKEWORD(2,2) , &wsa);
+
+	SOCKET server_socket;
+	server_socket = socket(AF_INET , SOCK_DGRAM , 0);
+	if(server_socket == INVALID_SOCKET){
+		printf("socket error!");
+		return -1;
+	}
+
+	SOCKADDR_IN server_addr;
+	memset(&server_addr , 0 , sizeof(server_addr));
+	server_addr.sin_family = AF_INET;
+	server_addr.sin_port = htons(12345);
+	server_addr.sin_addr.s_addr = inet_addr("192.168.2.130");
+
+	int error;
+
+	error = bind(server_socket , (SOCKADDR*)&server_addr , sizeof(server_addr));
+	if(error == SOCKET_ERROR){
+		printf("BIND ERROR!!");
+		return -1;
+	}
+
+	SOCKADDR_IN client_addr;
+	memset(&client_addr, 0 , sizeof(client_addr));
+	int client_size = sizeof(client_addr);
+
+
+	char addr[20];
+	memset(addr, 0 , sizeof(addr));
+	int recvsize, fsize;
+	int datasize = 1460;
+	int size = 0;
+
+	recvsize = recvfrom(server_socket , addr,sizeof(addr),0,(SOCKADDR*)&client_addr,&client_size);
+
+	FILE* fp = fopen(addr , "rb");
+	fseek(fp , 0  , SEEK_END);
+	fsize = ftell(fp);
+	fseek(fp , 0 , SEEK_SET);
+	char* buf = (char*)malloc(fsize);
+	fread(buf , 1 ,fsize , fp);
+
+	sendto(server_socket , (char*)&fsize,sizeof(fsize),0,(SOCKADDR*)&client_addr,client_size);
+
+	while(1)
+	{
+		datasize = sendto(server_socket , &buf[size] , datasize ,0,(SOCKADDR*)&client_addr,client_size);
+		if(datasize == 0)
+			break;
+
+		size += datasize;
+		fsize -= datasize;
+		if(fsize <= 1460)
+			datasize = fsize;
+
+	}
+	free(buf);
+	fclose(fp);
+	closesocket(server_socket);
+	WSACleanup();
+		
+	return 0;
+	
+}
