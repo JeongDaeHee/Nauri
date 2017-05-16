@@ -1,0 +1,86 @@
+#include <stdio.h>
+#include <winsock2.h>
+#pragma comment (lib , "ws2_32.lib")
+#include <time.h>
+
+
+int main()
+{
+	WSADATA wsa;
+	WSAStartup(MAKEWORD(2,2) , &wsa);
+
+	SOCKET server_socket;
+	server_socket = socket(AF_INET , SOCK_DGRAM , 0);
+	if(server_socket == INVALID_SOCKET){
+		printf("socket error!");
+		return -1;
+	}
+
+	SOCKADDR_IN server_addr;
+	memset(&server_addr , 0 , sizeof(server_addr));
+	server_addr.sin_family = AF_INET;
+	server_addr.sin_port = htons(12345);
+	server_addr.sin_addr.s_addr = inet_addr("192.168.2.130");
+
+	int error;
+
+	error = bind(server_socket , (SOCKADDR*)&server_addr , sizeof(server_addr));
+	if(error == SOCKET_ERROR){
+		printf("BIND ERROR!!");
+		return -1;
+	}
+
+
+	int size=0,recvsize = 1460;
+	int fsize=0;
+	
+
+	size = recvfrom(server_socket , (char*)&fsize , sizeof(fsize) , 0 , NULL,NULL);
+	printf("fsize : %d\n" , fsize);
+	char* buf = (char*)malloc(fsize);
+	memset(buf , 0 , fsize);
+	char data[1460];
+	int i=0;
+
+	while(1)
+	{
+		recvsize = recvfrom(server_socket , data , recvsize , 0 , NULL,NULL);
+		if(recvsize == 0)
+			break;
+	
+		memcpy(&buf[size], data,recvsize);
+		size += recvsize;
+		printf("recvsize : %d\n",recvsize);
+		printf("recv sequence %d complete!\n",i);
+		i++;
+	
+	}
+
+	FILE* fp = fopen("C:\\copy1.jpg" , "wb");
+	fwrite(buf , 1 , fsize , fp);
+	fclose(fp);
+
+
+
+
+
+	/*내 답 
+	while(fsize > 1540)
+	{
+		memset(buf , 0 , sizeof(buf));
+		recvfrom(server_socket , buf , 1540 , 0 , NULL,NULL);
+		fwrite(buf , 1 , sizeof(buf) , fp);
+		fsize -= 1540;
+		printf("fsize : %d\n" , fsize);
+		printf("sequence num %d complete!\n",i);
+		i++;
+	}
+	*/
+
+
+	closesocket(server_socket);
+	WSACleanup();
+		
+	return 0;
+	
+}
