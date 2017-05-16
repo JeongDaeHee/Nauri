@@ -1,0 +1,62 @@
+#include <stdio.h>
+#include <winsock2.h>
+#pragma comment (lib, "ws2_32.lib")
+
+
+int main()
+{
+	WSADATA wsa;
+	WSAStartup(MAKEWORD(2,2) , &wsa);
+
+	SOCKET client_socket;
+	client_socket = socket(AF_INET , SOCK_DGRAM , 0);
+	if(client_socket == INVALID_SOCKET){
+		printf("SOCKET ERROR!");
+		return -1;
+	}
+
+	SOCKADDR_IN server_addr;
+	memset(&server_addr , 0 , sizeof(server_addr));
+	server_addr.sin_family = AF_INET;
+	server_addr.sin_port = htons(12345);
+	server_addr.sin_addr.s_addr = inet_addr("192.168.2.130");
+
+	int sendsize,fsize;
+	int size = 0;
+	int datasize = 1460;
+	char addr[20];
+	printf("파일을 가져올 경로를 입력하세요 : ");
+	scanf("%s",addr);
+
+	sendsize = sendto(client_socket , addr , strlen(addr) , 0 , (SOCKADDR*)&server_addr, sizeof(server_addr));
+
+	recvfrom(client_socket , (char*)&fsize, sizeof(fsize), 0 , NULL,NULL);
+
+	char* buf = (char*)malloc(fsize);
+	char data[1460];
+
+	while(1)
+	{
+		datasize = recvfrom(client_socket , data, datasize, 0 , NULL,NULL);
+		if(datasize == 0)
+			break;
+
+		memcpy(&buf[size], data, datasize);
+		size += datasize;
+
+	}
+
+	FILE* fp = fopen(addr,"wb");
+	fwrite(buf,  1 , fsize , fp);
+	
+
+	fclose(fp);
+	free(buf);
+	closesocket(client_socket);
+	WSACleanup();
+
+
+	
+	return 0;
+		
+}
