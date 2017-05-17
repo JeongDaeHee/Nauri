@@ -1,0 +1,60 @@
+#include <stdio.h>
+#include <winsock2.h>
+#pragma comment(lib, "ws2_32.lib")
+
+int main()
+{
+	/*DLL 메모리 로드*/
+	WSADATA wsa;
+	WSAStartup(MAKEWORD(2,2), &wsa);
+
+	/*소켓 핸들 생성*/
+	SOCKET udps;
+	udps = socket(AF_INET, SOCK_DGRAM,0);
+	if(udps == INVALID_SOCKET)
+	{
+		printf("socket error!\n");
+		return -1;
+	}
+	
+	/*주소 결합*/
+	int error = 0;
+	SOCKADDR_IN srvaddr;
+	memset(&srvaddr, 0, sizeof(srvaddr));
+	srvaddr.sin_family = AF_INET;
+	srvaddr.sin_port = htons(12345);
+	srvaddr.sin_addr.s_addr = inet_addr("192.168.2.128");
+
+	error = bind(udps, (SOCKADDR*)&srvaddr, sizeof(srvaddr));
+	if(error == SOCKET_ERROR)
+	{
+		printf("bind error!\n");
+		return -1;
+	}
+	
+	/* 데이터 수신 */
+
+
+
+	SOCKADDR_IN sendaddr;
+	memset(&sendaddr, 0, sizeof(sendaddr));
+	int addrsize = sizeof(sendaddr);
+
+	int answer;
+	char buf[200];
+	memset(buf, 0 , sizeof(buf));
+
+	recvfrom(udps, buf , sizeof(buf),0,(SOCKADDR*)&sendaddr,&addrsize);
+	printf("%s",buf);
+	scanf("%d",&answer);
+
+	sendto(udps , (char*)&answer , sizeof(answer) , 0 , (SOCKADDR*)&sendaddr,addrsize);
+	printf("응답 완료!\n");
+
+
+
+	/*소켓 종료*/
+	closesocket(udps);
+	WSACleanup();
+	return 0;
+}
