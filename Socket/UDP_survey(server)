@@ -1,0 +1,77 @@
+#include <stdio.h>
+#include <winsock2.h>
+#pragma comment(lib, "ws2_32.lib")
+#include <time.h>
+
+
+int main()
+{
+	WSADATA wsa;
+	WSAStartup(MAKEWORD(2,2), &wsa);
+
+	SOCKET s;
+	s = socket(AF_INET, SOCK_DGRAM, 0);
+	if(s == INVALID_SOCKET)
+	{
+		printf("socket error!\n");
+		return -1;
+	}
+
+	BOOL opt = TRUE;
+	setsockopt(s,SOL_SOCKET,SO_BROADCAST,(char*)&opt,sizeof(opt));
+	
+	/* 데이터 송신 */
+	SOCKADDR_IN srvaddr;
+	memset(&srvaddr, 0, sizeof(srvaddr));
+
+	srvaddr.sin_family = AF_INET;
+	srvaddr.sin_port = htons(12345);
+	srvaddr.sin_addr.s_addr = inet_addr("192.168.2.255");
+
+
+	printf("[질문] 가고자 하는 직무를 선택하시오.\n1. 시스템관리자\n2. 네트워크관리자\n3. 프로그래머\n4. 정보보안관리자\n");
+
+	char buf[] = "[질문] 가고자 하는 직무를 선택하시오.\n1. 시스템관리자\n2. 네트워크관리자\n3. 프로그래머\n4. 정보보안관리자\n";
+	int n1=0,n2=0,n3=0,n4=0;
+	int answer[20];
+	memset(answer , 0 , sizeof(answer));
+	int sendsize,recvsize;
+	int recvtime = 7000;
+	int i=0;
+
+
+	setsockopt(s,SOL_SOCKET,SO_RCVTIMEO,(char*)&recvtime , sizeof(recvtime));
+
+	sendsize = sendto(s, buf, sizeof(buf),0,(SOCKADDR*)&srvaddr,sizeof(srvaddr));
+
+	while(recvsize != -1)
+	{
+		recvsize = recvfrom(s , (char*)&answer[i], sizeof(answer[i]) , 0 , NULL,NULL);
+		i++;
+	}
+
+	for(i = 0 ; answer[i] ; i++)
+	{
+		if(answer[i] == 1)
+			n1++;
+		if(answer[i] == 2)
+			n2++;
+		if(answer[i] == 3)
+			n3++;
+		if(answer[i] == 4)
+			n4++;
+	}
+
+
+	printf("### 설문 조사 결과 ###\n");
+	printf("1번 : %d명\n",n1);
+	printf("2번 : %d명\n",n2);
+	printf("3번 : %d명\n",n3);
+	printf("4번 : %d명\n",n4);
+
+
+
+	closesocket(s);
+	WSACleanup();
+	return 0;
+}
